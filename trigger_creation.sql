@@ -48,3 +48,21 @@ BEGIN
         :NEW.BOOKING_SERVICE_ID := BOOKING_SERVICE_ID_SEQ.NEXTVAL;
     END IF;
 END;
+
+CREATE OR REPLACE TRIGGER update_room_availability
+AFTER INSERT ON Bookings
+FOR EACH ROW
+BEGIN
+    UPDATE Rooms
+    SET is_available = 'N'
+    WHERE id = :NEW.room_id;
+END;
+
+CREATE OR REPLACE TRIGGER restore_room_availability
+AFTER DELETE ON Bookings
+FOR EACH ROW
+BEGIN
+    UPDATE Rooms
+    SET is_available = 'Y'
+    WHERE id = :NEW.room_id;
+END;
