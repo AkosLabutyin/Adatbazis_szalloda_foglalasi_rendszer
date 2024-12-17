@@ -92,7 +92,7 @@ BEGIN
             EMAIL = P_EMAIL;
     EXCEPTION
         WHEN NO_DATA_FOUND THEN
-            V_GUEST_ID := CREATE_QUESTS(
+            V_GUEST_ID := CREATE_GUESTS(
                 P_GUEST_NAME => P_GUEST_NAME,
                 P_PHONE_NUMBER => P_PHONE_NUMBER,
                 P_EMAIL => P_EMAIL
