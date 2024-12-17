@@ -64,5 +64,5 @@ FOR EACH ROW
 BEGIN
     UPDATE Rooms
     SET is_available = 'Y'
-    WHERE id = :NEW.room_id;
+    WHERE id = :OLD.room_id;
 END;
