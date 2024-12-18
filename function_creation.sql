@@ -25,42 +25,13 @@ BEGIN
     RETURN V_TOTAL_PRICE;
 END;
 
-CREATE OR REPLACE FUNCTION CREATE_GUESTS(
-    P_GUEST_NAME IN VARCHAR,
-    P_PHONE_NUMBER IN VARCHAR,
-    P_EMAIL IN VARCHAR
-) RETURN NUMBER IS
-    V_GUEST_ID NUMBER;
-BEGIN
-    INSERT INTO GUESTS(
-        GUEST_NAME,
-        PHONE_NUMBER,
-        EMAIL
-    ) VALUES(
-        P_GUEST_NAME,
-        P_PHONE_NUMBER,
-        P_EMAIL
-    ) RETURNING ID INTO V_GUEST_ID;
-    RETURN V_GUEST_ID;
-END;
-
-SET SERVEROUTPUT ON;
-
-DECLARE
-    V_NEW_GUEST_ID NUMBER;
-BEGIN
-    V_NEW_GUEST_ID := CREATE_GUESTS( P_GUEST_NAME => 'Akos Lab', 
-                                     P_PHONE_NUMBER => '1234567890', 
-                                     P_EMAIL => 'akos.test@example.com' );
-    DBMS_OUTPUT.PUT_LINE('The new guest ID is: '
-                         || V_NEW_GUEST_ID);
-END;
 --Test
 SET SERVEROUTPUT ON;
 
 DECLARE
     v_booking_total NUMBER;
 BEGIN
-    v_booking_total := calculate_total_price(6500);
+    v_booking_total := calculate_total_price(6504);
     DBMS_OUTPUT.PUT_LINE('The total price for the booking is: ' || v_booking_total);
 END;
+

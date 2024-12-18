@@ -1,0 +1,122 @@
+CREATE OR REPLACE PACKAGE PKG_BOOKING_MODIFICATIONS AS
+
+    cannot_delete_EXC EXCEPTION;
+    PRAGMA EXCEPTION_INIT(cannot_delete_EXC, -20200);
+
+    PROCEDURE DELETE_BOOKING(
+        P_BOOKING_ID NUMBER
+    );
+
+    PROCEDURE ADD_SERVICE(
+        P_BOOKING_ID NUMBER,
+        P_SERVICE_NAME VARCHAR,
+        P_QUANTITY NUMBER DEFAULT 1
+    );
+
+    PROCEDURE MODIFY_BOOKING_DATES(
+        P_BOOKING_ID NUMBER,
+        P_NEW_CHECK_IN TIMESTAMP,
+        P_NEW_CHECK_OUT TIMESTAMP
+    );
+END PKG_BOOKING_MODIFICATIONS;
+
+CREATE OR REPLACE PACKAGE BODY PKG_BOOKING_MODIFICATIONS AS
+
+    PROCEDURE DELETE_BOOKING(
+        P_BOOKING_ID NUMBER
+    ) AS
+    v_room_id number;
+    BEGIN
+        select room_id into v_room_id 
+        from BOOKINGS
+        where BOOKING_ID = P_BOOKING_ID; 
+
+        DELETE FROM BOOKING_SERVICES
+        WHERE
+            BOOKING_ID = P_BOOKING_ID;
+        DELETE FROM BOOKINGS
+        WHERE
+            BOOKING_ID = P_BOOKING_ID;
+        restore_room_availability( v_room_id  );
+        DBMS_OUTPUT.PUT_LINE('Booking deletion successful.');
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error has occurred while deleting');
+            RAISE cannot_delete_EXC;
+    END DELETE_BOOKING;
+
+    PROCEDURE ADD_SERVICE(
+        P_BOOKING_ID NUMBER,
+        P_SERVICE_NAME VARCHAR,
+        P_QUANTITY NUMBER DEFAULT 1
+    )IS
+        V_SERVICE_ID NUMBER;
+    BEGIN
+        SELECT
+            SERVICE_ID INTO V_SERVICE_ID
+        FROM
+            SERVICES
+        WHERE
+            SERVICE_NAME = P_SERVICE_NAME;
+        INSERT INTO BOOKING_SERVICES(
+            BOOKING_ID,
+            SERVICE_ID,
+            QUANTITY
+        )VALUES(
+            P_BOOKING_ID,
+            V_SERVICE_ID,
+            P_QUANTITY
+        );
+    END ADD_SERVICE;
+
+    PROCEDURE MODIFY_BOOKING_DATES(
+        P_BOOKING_ID NUMBER,
+        P_NEW_CHECK_IN TIMESTAMP,
+        P_NEW_CHECK_OUT TIMESTAMP
+    )IS
+        V_PRICE_PER_NIGHT NUMBER;
+        V_ROOM_ID         NUMBER;
+        V_NEW_TOTAL_PRICE NUMBER;
+    BEGIN
+        SELECT
+            ROOM_ID INTO V_ROOM_ID
+        FROM
+            BOOKINGS
+        WHERE
+            BOOKING_ID = P_BOOKING_ID;
+        SELECT
+            PRICE_PER_NIGHT INTO V_PRICE_PER_NIGHT
+        FROM
+            ROOMS
+        WHERE
+            ID = V_ROOM_ID;
+        V_NEW_TOTAL_PRICE := V_PRICE_PER_NIGHT * EXTRACT(DAY FROM (P_NEW_CHECK_OUT - P_NEW_CHECK_IN));
+        UPDATE BOOKINGS
+        SET
+            CHECK_IN_DATE = P_NEW_CHECK_IN,
+            CHECK_OUT_DATE = P_NEW_CHECK_OUT,
+            TOTAL_PRICE = V_NEW_TOTAL_PRICE
+        WHERE
+            BOOKING_ID = P_BOOKING_ID;
+    END MODIFY_BOOKING_DATES;
+END PKG_BOOKING_MODIFICATIONS;
+
+--Test 
+BEGIN
+    ADD_SERVICE(
+        P_BOOKING_ID => 6503,
+        P_SERVICE_NAME => 'Breakfast'
+    );
+END;
+BEGIN
+    DELETE_BOOKING(
+        P_BOOKING_ID => 6500
+    );
+END;
+BEGIN
+    MODIFY_BOOKING(
+        P_BOOKING_ID       => 6502,
+        P_NEW_CHECK_IN     => TO_TIMESTAMP('2024-12-20 15:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+        P_NEW_CHECK_OUT    => TO_TIMESTAMP('2024-12-23 10:00:00', 'YYYY-MM-DD HH24:MI:SS')
+    );
+end;

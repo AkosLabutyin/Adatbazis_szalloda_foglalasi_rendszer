@@ -66,3 +66,6 @@ BEGIN
     SET is_available = 'Y'
     WHERE id = :OLD.room_id;
 END;
+
+drop trigger update_room_availability;
+drop TRIGGER restore_room_availability;
