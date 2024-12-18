@@ -83,13 +83,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOOKING_CREATION AS
                 AND IS_AVAILABLE = 'Y';
         EXCEPTION
             WHEN NO_DATA_FOUND THEN
-                DBMS_OUTPUT.PUT_LINE('The selected room is not available');
                 RAISE ROOM_NOT_AVAILABLE_EXC;
                 RETURN;
         END;
 
         BEGIN
-            update_room_availability( v_room_id );
+            PKG_ROOM_AVAILABILITY.update_room_availability( v_room_id );
             V_TOTAL_PRICE := V_ROOM_PRICE_PER_NIGHT * EXTRACT(DAY FROM (P_CHECK_OUT_DATE - P_CHECK_IN_DATE));
             INSERT INTO BOOKINGS (
                 GUEST_ID,

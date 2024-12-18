@@ -37,11 +37,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOOKING_MODIFICATIONS AS
         DELETE FROM BOOKINGS
         WHERE
             BOOKING_ID = P_BOOKING_ID;
-        restore_room_availability( v_room_id  );
+        PKG_ROOM_AVAILABILITY.restore_room_availability( v_room_id  );
         DBMS_OUTPUT.PUT_LINE('Booking deletion successful.');
     EXCEPTION
         WHEN OTHERS THEN
-            DBMS_OUTPUT.PUT_LINE('Error has occurred while deleting');
             RAISE cannot_delete_EXC;
     END DELETE_BOOKING;
 

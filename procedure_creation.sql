@@ -1,13 +1,35 @@
-CREATE OR REPLACE PROCEDURE restore_room_availability(p_room_id IN NUMBER) AS
-BEGIN
-    UPDATE Rooms
-    SET is_available = 'Y'
-    WHERE id = p_room_id;
-END restore_room_availability;
+CREATE OR REPLACE PACKAGE PKG_ROOM_AVAILABILITY AS
 
-CREATE OR REPLACE PROCEDURE update_room_availability(p_room_id IN NUMBER) AS
-BEGIN
-    UPDATE Rooms
-    SET is_available = 'N'
-    WHERE id = p_room_id;
-END update_room_availability;
+    PROCEDURE UPDATE_ROOM_AVAILABILITY(
+        P_ROOM_ID IN NUMBER
+    );
+
+    PROCEDURE RESTORE_ROOM_AVAILABILITY(
+        P_ROOM_ID IN NUMBER
+    );
+END PKG_ROOM_AVAILABILITY;
+
+CREATE OR REPLACE PACKAGE BODY PKG_ROOM_AVAILABILITY AS
+
+    PROCEDURE RESTORE_ROOM_AVAILABILITY(
+        P_ROOM_ID IN NUMBER
+    ) AS
+    BEGIN
+        UPDATE ROOMS
+        SET
+            IS_AVAILABLE = 'Y'
+        WHERE
+            ID = P_ROOM_ID;
+    END RESTORE_ROOM_AVAILABILITY;
+
+    PROCEDURE UPDATE_ROOM_AVAILABILITY(
+        P_ROOM_ID IN NUMBER
+    ) AS
+    BEGIN
+        UPDATE ROOMS
+        SET
+            IS_AVAILABLE = 'N'
+        WHERE
+            ID = P_ROOM_ID;
+    END UPDATE_ROOM_AVAILABILITY;
+END PKG_ROOM_AVAILABILITY;
