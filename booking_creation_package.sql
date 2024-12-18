@@ -83,8 +83,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOOKING_CREATION AS
                 AND IS_AVAILABLE = 'Y';
         EXCEPTION
             WHEN NO_DATA_FOUND THEN
-                RAISE ROOM_NOT_AVAILABLE_EXC;
-                RETURN;
+                RAISE_APPLICATION_ERROR(-20101, 'The selected room is not available');
         END;
 
         BEGIN
@@ -119,8 +118,8 @@ BEGIN
     PKG_BOOKING_CREATION.CREATE_BOOKING(
         P_GUEST_NAME => 'Akssss Lab',
         P_PHONE_NUMBER => '1234567890',
-        P_EMAIL => 'akos.v345345i@example.com',
-        P_ROOM_TYPE => 'Suite',
+        P_EMAIL => 'akos.5i@example.com',
+        P_ROOM_TYPE => 'Single',
         P_CHECK_IN_DATE => TO_TIMESTAMP('2024-12-20 14:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         P_CHECK_OUT_DATE => TO_TIMESTAMP('2024-12-22 10:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         P_SERVICE => 'Breakfast'
